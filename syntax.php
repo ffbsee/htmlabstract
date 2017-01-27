@@ -2,7 +2,6 @@
 /**
  * @file syntax.php
  * @brief DokuWiki syntax plugin : htmlabstract
- * @author Vincent Feltz <psycho@feltzv.fr>
  * @author Lilian Roller <l3d@see-base.de>
  */
 
@@ -10,15 +9,14 @@ if (!defined('DOKU_INC'))
 	define('DOKU_INC',realpath(dirname(__FILE__).'/../../').'/');
 if (!defined('DOKU_PLUGIN'))
 	define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
+
 require_once(DOKU_PLUGIN.'syntax.php');
 
-class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin
-{
+class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin{
 	/**
 	 * return informations for plugins managing page
 	 */
-    function getInfo()
-    {
+    function getInfo(){
         return array(
             'author' => 'Lilian Roller',
             'email'  => 'l3d@see-base.de',
@@ -55,7 +53,6 @@ class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin
 			return array($elements);
 		$content = $this->formatElements($elements, $params);
     	return array($content);
-        print $content;
     }
 
 	/**
@@ -110,7 +107,9 @@ class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin
 
         if ($params['feed_url'] == "https://ffbsee.de/rss.freifunk.net"){
             $params['feed_url'] = "https://rss.freifunk.net/tags/ffbsee.rss";
-        }
+            $pressefoo = True;
+        }else { $pressefoo = False; #für den pressefeed}
+
 
 		return $params;
 	}
@@ -118,8 +117,7 @@ class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin
 	/**
 	 * get and parse elements of targeted feed
 	 */
-	function getFeedElements($params)
-	{
+	function getFeedElements($params){
 		if (!($xml = @file_get_contents($params['feed_url'].'?'.$params['feed_params'])))
 			return '<b>ERROR : </b>Cannot get content from <a href="'.$params['feed_url'].'">'.$params['feed_url'].' !</a> Please check the feed URL.<br/>';
 		$dom = new DOMDocument();
@@ -127,75 +125,93 @@ class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin
 			return '<b>ERROR : </b>XML error in feed, cannot parse.<br/>';
 		$elements = array();
 		$items = $dom->getElementsByTagName('item');
-		$i = 0;
-		foreach ($items as $item)
-			{
-				$i = $i + 1;
+        if ($pressefoo){
+            $i = 0;
+    		foreach ($items as $item){
+                $i = $i + 1;
+   				if ($i < 3){
+    				$element = array();
+    				$details = $item->getElementsByTagName('*');
+    				foreach ($details as $detail)
+	    				switch ($detail->nodeName){
+		    				case 'title'  		:
+			    			case 'author' 		:
+				    		case 'pubDate'		:
+					    	case 'link'		:
+						    case 'description'	:
+	    					    $element[$detail->nodeName] = $detail->nodeValue;
+    							break;
+	        			}
+					if (!isset($element['author']))
+					$element['author'] = $params['unknown_author'];
+					$elements[] = $element;
+				}
 			}
-#		Ein wenig cheaten um den feed umzukehren...
-		$j = 0;
-		foreach ($items as $item)
-			{
+ 
+        } else {
+    		$i = 0;
+    		foreach ($items as $item)
+    			{
+    				$i = $i + 1;
+    			}
+            # Ein wenig cheaten um den feed umzukehren...
+    		$j = 0;
+    		foreach ($items as $item){
+   				$j = $j + 1;
+   				if ($j == $i){
+				$element = array();
+				$details = $item->getElementsByTagName('*');
+				foreach ($details as $detail)
+					switch ($detail->nodeName){
+						case 'title'  		:
+						case 'author' 		:
+						case 'pubDate'		:
+						case 'link'		:
+						case 'description'	:
+	    					$element[$detail->nodeName] = $detail->nodeValue;
+							break;
+					}
+					if (!isset($element['author']))
+					$element['author'] = $params['unknown_author'];
+					$elements[] = $element;
+				}
+			}
+    		$j = 1;
+	    	foreach ($items as $item){
 				$j = $j + 1;
 				if ($j == $i){
 					$element = array();
 					$details = $item->getElementsByTagName('*');
 					foreach ($details as $detail)
-						switch ($detail->nodeName)
-						{
+						switch ($detail->nodeName){
 							case 'title'  		:
 							case 'author' 		:
 							case 'pubDate'		:
-							case 'link'		:
+							case 'link' 		:
 							case 'description'	:
-								$element[$detail->nodeName] = $detail->nodeValue;
-							break;
+       							$element[$detail->nodeName] = $detail->nodeValue;
+		    					break;
 						}
 					if (!isset($element['author']))
 						$element['author'] = $params['unknown_author'];
 					$elements[] = $element;
 				}
 			}
-		$j = 1;
-		foreach ($items as $item)
-			{
+		    $j = 2;
+		    foreach ($items as $item){
 				$j = $j + 1;
 				if ($j == $i){
 					$element = array();
 					$details = $item->getElementsByTagName('*');
 					foreach ($details as $detail)
-						switch ($detail->nodeName)
-						{
+						switch ($detail->nodeName){
 							case 'title'  		:
 							case 'author' 		:
 							case 'pubDate'		:
 							case 'link'		:
 							case 'description'	:
 								$element[$detail->nodeName] = $detail->nodeValue;
-							break;
-						}
-					if (!isset($element['author']))
-						$element['author'] = $params['unknown_author'];
-					$elements[] = $element;
-				}
-			}
-		$j = 2;
-		foreach ($items as $item)
-			{
-				$j = $j + 1;
-				if ($j == $i){
-					$element = array();
-					$details = $item->getElementsByTagName('*');
-					foreach ($details as $detail)
-						switch ($detail->nodeName)
-						{
-							case 'title'  		:
-							case 'author' 		:
-							case 'pubDate'		:
-							case 'link'		:
-							case 'description'	:
-								$element[$detail->nodeName] = $detail->nodeValue;
-							break;
+    							break;
 						}
 					if (!isset($element['author']))
 						$element['author'] = $params['unknown_author'];
@@ -208,13 +224,11 @@ class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin
 	/**
 	 * format elements to put them in a list of coloured-background previews
 	 */
-	function formatElements($elements, $params)
-	{
+	function formatElements($elements, $params){
 		$css = ' style="background-color:#'.$params['bg_color'].'; padding: 0px 5px 5px; overflow:auto; margin-bottom: 20px;"';
 		$content = '</p><ul class="rss">'."\n";  // need to close the <p> opened by DW before plugin handling for W3C compliance (<ul> mustn't be contained by <p>)
 		$content.= '<!-- preview produced with HtmlAbstract - http://dokuwiki.org/plugin:htmlabstract --> '."\n";
-		foreach ($elements as $element)
-		{
+		foreach ($elements as $element){
 			$item = '<li>'."\n";
 			$item .= '<div class="li"'.$css.'>'."\n";
 			if ($params['title'])
@@ -235,11 +249,10 @@ class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin
 	}
 
 //TODO à refaire pour les windowsiens!
-	/**
+	 /**
 	 * format feed items'dates to adapt them to local wiki config (config:dformat)
 	 */
-	function formatDate($date)
-	{
+	function formatDate($date){
 		global $conf;
 
 		if (false !== strpos($_SERVER['SERVER_SOFTWARE'], 'Win32') ||
@@ -256,13 +269,11 @@ class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin
 	/**
 	 * cut abstracts to desired length, searches the cleaner cut, and close broken tags
  	 */
-	function formatDescription($text, $params)
-	{
+	function formatDescription($text, $params){
 		$cut = $this->cutTextToLength($text, $params['maxlen']);
 		$text = preg_replace('/<([a-z]+[^>]*) id="([^>]+)"/', '<$1 id="${2}_htmlabstract_'.microtime(true).'"', $text);
 			//time() is used here for W3C compliance (avoid duplicated id's)
-		if ($cut && $params['trycleancut'])
-		{
+		if ($cut && $params['trycleancut']){
 			$min = ($params['maxlen'] > 400) ? (200) : ($params['maxlen'] / 2);
 			if (FALSE !== ($pos = strrpos($text, "</p>")) && $pos >= $min)
 				$text = substr($text, 0, 4 + $pos);
@@ -276,8 +287,7 @@ class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin
 	/**
 	 * brutally cut abstract to desired length without considering html tags
 	 */
-	function cutTextToLength(&$text, $maxlen)
-	{
+	function cutTextToLength(&$text, $maxlen){
 		$intag = false;
 		$i = -1;
 		$len = 0;
@@ -299,8 +309,7 @@ class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin
 	/**
 	 * search tags broken by brutal cut and close them
 	 */
-	function closeBrokenTags($text)
-	{
+	function closeBrokenTags($text){
 		$tags = array();
 		$i = -1;
 		$textlen = strlen($text);
@@ -329,4 +338,5 @@ class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin
 	}
 
 }
+
 ?>
