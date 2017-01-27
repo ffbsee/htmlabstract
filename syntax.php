@@ -68,36 +68,38 @@ class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin{
 	/**
 	 * determines params to be used from match and configuration
 	 */
-	function splitAndSortParams($match)
-	{
+	function splitAndSortParams($match){
 		global $conf;
 
 		$match = trim(trim($match, '{}'));
     	$match = substr($match, strlen("htmlabs>"));
-    	if (false !== strpos($match, ' '))
+    	if (false !== strpos($match, ' ')){
 			$params['feed_url'] = trim(substr($match, 0, strpos($match, ' ')));
-		else
+        }else{
 			$params['feed_url'] = trim($match);
-		$match = substr($match, strlen($params['feed_url']) + 1);
-		if (substr($params['feed_url'], 0, 7) != 'http://')
+		}
+        $match = substr($match, strlen($params['feed_url']) + 1);
+		if (substr($params['feed_url'], 0, 7) != 'http://'){
 			$params['feed_url'] = DOKU_URL.$params['feed_url'];
-		if (false !== ($pos = strpos($params['feed_url'], '?')))
-		{
+        }
+		if (false !== ($pos = strpos($params['feed_url'], '?'))){
 			$tmp = explode('?', $params['feed_url']);
 			$params['feed_url'] = $tmp[0];
 			$params['feed_params'] = $tmp[1];
 		}
-		else
+		else{
 			$params['feed_params'] = '';
-		$params['feed_params'] .= '&content=html&type=rss2';
+		}
+        $params['feed_params'] .= '&content=html&type=rss2';
 		$opts = explode(' ', strtolower($match));
 		$params['author'] = !in_array('noauthor', $opts);
 		$params['title'] = !in_array('notitle', $opts);
 		$params['date'] = !in_array('nodate', $opts);
 		$params['textlink'] = $this->getConf('textlink') ? $this->getConf('textlink') : $this->getLang("textlink");
 		$params['maxlen'] = $this->getConf('maxlength');
-		if ($params['maxlen'] <= 0)
+		if ($params['maxlen'] <= 0){
 			$params['maxlen'] = 750;
+        }
 		$params['trycleancut'] = $this->getConf('paragraph');
 		$params['bg_color'] = $this->getConf('bg_color');
 		$params['unknown_author'] = $this->getLang('extern_edit');
@@ -108,7 +110,9 @@ class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin{
         if ($params['feed_url'] == "https://ffbsee.de/rss.freifunk.net"){
             $params['feed_url'] = "https://rss.freifunk.net/tags/ffbsee.rss";
             $pressefoo = True;
-        }else { $pressefoo = False; #für den pressefeed}
+        }else { 
+            $pressefoo = False; #für den pressefeed
+        }
 
 
 		return $params;
@@ -147,13 +151,13 @@ class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin{
 					$elements[] = $element;
 				}
 			}
+         return $elements;
  
         } else {
     		$i = 0;
-    		foreach ($items as $item)
-    			{
+    		foreach ($items as $item){
     				$i = $i + 1;
-    			}
+    		}
             # Ein wenig cheaten um den feed umzukehren...
     		$j = 0;
     		foreach ($items as $item){
@@ -338,5 +342,4 @@ class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin{
 	}
 
 }
-
 ?>
