@@ -11,4 +11,8 @@ cd lib/plugins/
 git clone https://github.com/ffbsee/htmlabstract.git
 ```
 
-Und dann über den Pluginmanager installieren...
+Und dann über den Pluginmanager aktivieren...
+
+!ACHTUNG!
+Derzeit ist das Updaten automatisiert nur über git möglich!
+
