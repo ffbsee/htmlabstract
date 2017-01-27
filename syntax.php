@@ -20,11 +20,11 @@ class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin
     function getInfo()
     {
         return array(
-            'author' => 'Lilian Roller and Vincent Feltz',
-            'email'  => 'l3d@see-base.de|psycho@feltzv.fr',
-            'date'   => '2017-01-07', //first version 2008-11-14
+            'author' => 'Lilian Roller',
+            'email'  => 'l3d@see-base.de',
+            'date'   => '2017-01-27', //first version 2008-11-14
             'name'   => 'HtmlAbstract',
-            'desc'   => 'Moddified for FFBSee -> DO NOT UPDATE without talking to "L3D" at irc.hackint.org; Usually Allows integration of remote or local DW RSS feeds using html formatted abstracts instead of choosing between html OR abstract.',
+            'desc'   => 'Moddified for FFBSee -> UPDATER DEFECT; Usually Allows integration of remote or local DW RSS feeds using html formatted abstracts instead of choosing between html OR abstract.',
             'url'    => 'http://www.dokuwiki.org/plugin:htmlabstract',
         );
     }
