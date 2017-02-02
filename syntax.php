@@ -106,11 +106,13 @@ class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin
 		$params['unknown_author'] = $this->getLang('extern_edit');
 
 
-        print $params['feed_url'];
+        #print $params['feed_url'];
 
         if ($params['feed_url'] == "https://ffbsee.de/rss.freifunk.net" or $params['feed_url'] == "https://www.ffbsee.de/rss.freifunk.net" or $params['feed_url'] == "https://freifunk-bodensee.net/rss.freifunk.net" or $params['feed_url'] == "https://www.freifunk-bodensee.net/rss.freifunk.net") {
             $params['feed_url'] = "https://rss.freifunk.net/tags/ffbsee.rss";
-            print "Hi";
+            $pressefeed = True;
+        } else {
+            $pressefeed = False;
         }
 
 		return $params;
