@@ -12,6 +12,8 @@ if (!defined('DOKU_PLUGIN'))
 	define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 
+global $pressefeed;
+
 class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin
 {
 	/**
@@ -110,9 +112,10 @@ class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin
 
         if ($params['feed_url'] == "https://ffbsee.de/rss.freifunk.net" or $params['feed_url'] == "https://www.ffbsee.de/rss.freifunk.net" or $params['feed_url'] == "https://freifunk-bodensee.net/rss.freifunk.net" or $params['feed_url'] == "https://www.freifunk-bodensee.net/rss.freifunk.net") {
             $params['feed_url'] = "https://rss.freifunk.net/tags/ffbsee.rss";
-            $pressefeed = True;
+            $pressefeed = 1;
+            print "True";
         } else {
-            $pressefeed = False;
+            $pressefeed = 0;
         }
 
 		return $params;
@@ -137,8 +140,76 @@ class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin
 			}
 #		Ein wenig cheaten um den feed umzukehren...
 		$j = 0;
-		foreach ($items as $item)
-			{
+        print "$pressefeed foo  - ";
+        if ($pressefeed == 1){
+            print "Hi";
+      		foreach ($items as $item){
+				$j = $j + 1;
+				if ($j < 3){
+					$element = array();
+				    $details = $item->getElementsByTagName('*');
+				    foreach ($details as $detail)
+						switch ($detail->nodeName)
+						{
+							case 'title'  		:
+							case 'author' 		:
+							case 'pubDate'		:
+							case 'link'		:
+							case 'description'	:
+								$element[$detail->nodeName] = $detail->nodeValue;
+							break;
+						}
+					    if (!isset($element['author']))
+						$element['author'] = $params['unknown_author'];
+					    $elements[] = $element;
+			    	}
+		    	}
+   
+        }else{
+    		foreach ($items as $item){
+				$j = $j + 1;
+				if ($j == $i){
+					$element = array();
+				    $details = $item->getElementsByTagName('*');
+				    foreach ($details as $detail)
+						switch ($detail->nodeName)
+						{
+							case 'title'  		:
+							case 'author' 		:
+							case 'pubDate'		:
+							case 'link'		:
+							case 'description'	:
+								$element[$detail->nodeName] = $detail->nodeValue;
+							break;
+						}
+					    if (!isset($element['author']))
+						$element['author'] = $params['unknown_author'];
+					    $elements[] = $element;
+			    	}
+		    	}
+    		$j = 1;
+	    	foreach ($items as $item){
+				$j = $j + 1;
+				if ($j == $i){
+					$element = array();
+					$details = $item->getElementsByTagName('*');
+					foreach ($details as $detail)
+						switch ($detail->nodeName){
+    						case 'title'  		:
+							case 'author' 		:
+							case 'pubDate'		:
+							case 'link'		:
+							case 'description'	:
+								$element[$detail->nodeName] = $detail->nodeValue;
+							break;
+						}
+					if (!isset($element['author']))
+						$element['author'] = $params['unknown_author'];
+					$elements[] = $element;
+				}
+			}
+    		$j = 2;
+	    	foreach ($items as $item){
 				$j = $j + 1;
 				if ($j == $i){
 					$element = array();
@@ -159,52 +230,7 @@ class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin
 					$elements[] = $element;
 				}
 			}
-		$j = 1;
-		foreach ($items as $item)
-			{
-				$j = $j + 1;
-				if ($j == $i){
-					$element = array();
-					$details = $item->getElementsByTagName('*');
-					foreach ($details as $detail)
-						switch ($detail->nodeName)
-						{
-							case 'title'  		:
-							case 'author' 		:
-							case 'pubDate'		:
-							case 'link'		:
-							case 'description'	:
-								$element[$detail->nodeName] = $detail->nodeValue;
-							break;
-						}
-					if (!isset($element['author']))
-						$element['author'] = $params['unknown_author'];
-					$elements[] = $element;
-				}
-			}
-		$j = 2;
-		foreach ($items as $item)
-			{
-				$j = $j + 1;
-				if ($j == $i){
-					$element = array();
-					$details = $item->getElementsByTagName('*');
-					foreach ($details as $detail)
-						switch ($detail->nodeName)
-						{
-							case 'title'  		:
-							case 'author' 		:
-							case 'pubDate'		:
-							case 'link'		:
-							case 'description'	:
-								$element[$detail->nodeName] = $detail->nodeValue;
-							break;
-						}
-					if (!isset($element['author']))
-						$element['author'] = $params['unknown_author'];
-					$elements[] = $element;
-				}
-			}
+        }
 		return $elements;
 	}
 
