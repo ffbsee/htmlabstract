@@ -108,8 +108,9 @@ class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin
 
         print $params['feed_url'];
 
-        if ($params['feed_url'] == "https://ffbsee.de/rss.freifunk.net"){
+        if ($params['feed_url'] == "https://ffbsee.de/rss.freifunk.net" or $params['feed_url'] == "https://www.ffbsee.de/rss.freifunk.net" or $params['feed_url'] == "https://freifunk-bodensee.net/rss.freifunk.net" or $params['feed_url'] == "https://www.freifunk-bodensee.net/rss.freifunk.net") {
             $params['feed_url'] = "https://rss.freifunk.net/tags/ffbsee.rss";
+            print "Hi";
         }
 
 		return $params;
