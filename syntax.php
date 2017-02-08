@@ -76,7 +76,7 @@ class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin
 	function splitAndSortParams($match)
 	{
 		global $conf;
-
+        global $pressefeed;
 		$match = trim(trim($match, '{}'));
     	$match = substr($match, strlen("htmlabs>"));
     	if (false !== strpos($match, ' '))
@@ -110,10 +110,9 @@ class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin
 
         #print $params['feed_url'];
 
-        if ($params['feed_url'] == "https://ffbsee.de/rss.freifunk.net" or $params['feed_url'] == "https://www.ffbsee.de/rss.freifunk.net" or $params['feed_url'] == "https://freifunk-bodensee.net/rss.freifunk.net" or $params['feed_url'] == "https://www.freifunk-bodensee.net/rss.freifunk.net") {
+        if ($params['feed_url'] == "https://ffbsee.de/rss.freifunk.net" or $params['feed_url'] == "http://ffbsee.de/rss.freifunk.net" or $params['feed_url'] == "https://www.ffbsee.de/rss.freifunk.net" or $params['feed_url'] == "https://freifunk-bodensee.net/rss.freifunk.net" or $params['feed_url'] == "https://www.freifunk-bodensee.net/rss.freifunk.net") {
             $params['feed_url'] = "https://rss.freifunk.net/tags/ffbsee.rss";
             $pressefeed = 1;
-            print "True";
         } else {
             $pressefeed = 0;
         }
@@ -126,6 +125,7 @@ class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin
 	 */
 	function getFeedElements($params)
 	{
+        global $pressefeed;
 		if (!($xml = @file_get_contents($params['feed_url'].'?'.$params['feed_params'])))
 			return '<b>ERROR : </b>Cannot get content from <a href="'.$params['feed_url'].'">'.$params['feed_url'].' !</a> Please check the feed URL.<br/>';
 		$dom = new DOMDocument();
@@ -140,12 +140,10 @@ class syntax_plugin_htmlabstract extends DokuWiki_Syntax_Plugin
 			}
 #		Ein wenig cheaten um den feed umzukehren...
 		$j = 0;
-        print "$pressefeed foo  - ";
         if ($pressefeed == 1){
-            print "Hi";
       		foreach ($items as $item){
 				$j = $j + 1;
-				if ($j < 3){
+				if ($j < 4){
 					$element = array();
 				    $details = $item->getElementsByTagName('*');
 				    foreach ($details as $detail)
